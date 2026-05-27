@@ -11,7 +11,7 @@ xmin <- min(bw_locs$lon) - 2
 xmax <- max(bw_locs$lon) + 2
 
 # connect to full cmem catalog
-path_copernicusmarine <- here("data/cmem_library/copernicusmarine.exe") 
+path_copernicusmarine <- here("data/cmem_library/mac/copernicusmarine.cli") 
 
 # function to extract data from CMEM catalog ####
 cmem_nc <- function(cmem_id, out_directory, out_file, cmem_var, start_date, end_date, lon_min = xmin, lat_min = ymin, lon_max = xmax, lat_max = ymax){
@@ -46,11 +46,11 @@ for(i in 1:length(phys_vars)){
   print(curr_var)
 
   cmem_nc(cmem_id = "cmems_mod_glo_phy_my_0.083deg_P1D-m",
-          out_directory = here("data/physics/test"), 
-          out_file = paste0(curr_var,"_test.nc"),
+          out_directory = here("/Volumes/PROBOI/Data/CMEM_1994_2017_NEP_blwh/physics"), 
+          out_file = paste0(curr_var,"_Jan1994_Dec2017_0.083_D.nc"),
           cmem_var = curr_var,
-          start_date = "2016-01-01T00:00:00",
-          end_date = "2016-02-01T00:00:00") 
+          start_date = "1994-01-01T00:00:00",
+          end_date = "2017-12-31T00:00:00") 
   
   #regrid phys vars to 0.25 res
   curr_rast <- rast(here(paste0(out_directory,"/", out_file))) 
@@ -65,7 +65,7 @@ for(i in 1:length(phys_vars)){
   time(rast_clean) <- time(curr_rast)
   varnames(rast_clean) <- varnames(curr_rast)
 
-  writeCDF(rast_clean, here(paste0("data/physics/test_clean/", curr_var, ".nc")))
+  writeCDF(rast_clean, here(paste0("/Volumes/PROBOI/Data/CMEM_1994_2017_NEP_blwh/physics/processed/", curr_var, "_Jan1994_Dec2017_0.25_D.nc")))
 }
 
 # ocean biogeochem subset extract: 0m, full domain, Jan 2016 ####
@@ -77,11 +77,11 @@ for(i in 1:length(biogeo_vars)){
   print(curr_var)
 
   cmem_nc(cmem_id = "cmems_mod_glo_bgc_my_0.25deg_P1D-m",
-          out_directory = here("data/biogeo/test"), 
-          out_file = paste0(curr_var,"_test.nc"),
+          out_directory = here("/Volumes/PROBOI/Data/CMEM_1994_2017_NEP_blwh/biogeo"), 
+          out_file = paste0(curr_var,"_Jan1994_Dec2017_0.25_D.nc"),
           cmem_var = curr_var,
-          start_date = "2016-01-01T00:00:00",
-          end_date = "2016-02-01T00:00:00") 
+          start_date = "1994-01-01T00:00:00",
+          end_date = "2017-12-31T00:00:00") 
   
   #crop biogeo vars to match extent
   curr_rast <- rast(here(paste0(out_directory,"/", out_file))) 
@@ -96,12 +96,12 @@ for(i in 1:length(biogeo_vars)){
   time(rast_clean) <- time(curr_rast)
   varnames(rast_clean) <- varnames(curr_rast)
 
-  writeCDF(rast_clean, here(paste0("data/biogeo/test_clean/", curr_var, ".nc")))
+  writeCDF(rast_clean, here(paste0("/Volumes/PROBOI/Data/CMEM_1994_2017_NEP_blwh/biogeo/processed/", curr_var, "_Jan1994_Dec2017_0.25_D.nc")))
 }
 
 # static variables ####
 #bathymetry
-static_directory <- here("data/static")
+static_directory <- here("/Volumes/PROBOI/Data/CMEM_1994_2017_NEP_blwh/static")
 
 command <- paste(
   shQuote(path_copernicusmarine),
@@ -114,12 +114,14 @@ command <- paste(
   "--minimum-latitude -10.053",
   "--maximum-latitude 60.881",
   "-o", shQuote(static_directory), #save directory
-  "--output-filename bathy.nc", #save filename within directory
+  "--output-filename bathy_0.25deg.nc", #save filename within directory
   sep = " "
 )
 
+bathy_rast <- system(command)
+
  #crop bathy vars to match extent
-  curr_rast <- rast(here("data/static/bathy.nc")) 
+  curr_rast <- rast(here("/Volumes/PROBOI/Data/CMEM_1994_2017_NEP_blwh/static/bathy_0.25deg.nc")) 
 
   template_rast <- rast(
       crs = crs(curr_rast),
@@ -130,4 +132,5 @@ command <- paste(
   rast_clean <- resample(curr_rast, template_rast)
   varnames(rast_clean) <- varnames(curr_rast)
 
-  writeCDF(rast_clean, here("data/static/bathy_clean.nc"))
+  writeCDF(rast_clean, here("/Volumes/PROBOI/Data/CMEM_1994_2017_NEP_blwh/static/bathy_0.25deg_processed.nc"))
+  
