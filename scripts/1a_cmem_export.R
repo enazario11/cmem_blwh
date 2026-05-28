@@ -51,9 +51,11 @@ for(i in 1:length(phys_vars)){
           cmem_var = curr_var,
           start_date = "1994-01-01T00:00:00",
           end_date = "2017-12-31T00:00:00") 
-  
-  #regrid phys vars to 0.25 res
-  curr_rast <- rast(here(paste0(out_directory,"/", out_file))) 
+}
+
+#load and clean rasters, regrid to 0.25 res
+for(i in 1:length(phys_vars)){
+  curr_rast <- rast(here(paste0("/Volumes/PROBOI/Data/CMEM_1994_2017_NEP_blwh/physics/",phys_vars[i], "_Jan1994_Dec2017_0.083_D.nc"))) 
 
   template_rast <- rast(
       crs = crs(curr_rast),
@@ -61,11 +63,11 @@ for(i in 1:length(phys_vars)){
       resolution = 0.25 
     )
 
-  rast_clean <- resample(curr_rast, template_rast)
+  rast_clean <- terra::resample(curr_rast, template_rast)
   time(rast_clean) <- time(curr_rast)
   varnames(rast_clean) <- varnames(curr_rast)
 
-  writeCDF(rast_clean, here(paste0("/Volumes/PROBOI/Data/CMEM_1994_2017_NEP_blwh/physics/processed/", curr_var, "_Jan1994_Dec2017_0.25_D.nc")))
+  writeCDF(rast_clean, here(paste0("/Volumes/PROBOI/Data/CMEM_1994_2017_NEP_blwh/physics/processed/", phys_vars[i], "_Jan1994_Dec2017_0.25_D.nc")), overwrite = TRUE)
 }
 
 # ocean biogeochem subset extract: 0m, full domain, Jan 2016 ####
@@ -82,10 +84,13 @@ for(i in 1:length(biogeo_vars)){
           cmem_var = curr_var,
           start_date = "1994-01-01T00:00:00",
           end_date = "2017-12-31T00:00:00") 
-  
-  #crop biogeo vars to match extent
-  curr_rast <- rast(here(paste0(out_directory,"/", out_file))) 
+} 
 
+ for(i in 1:length(biogeo_vars)){
+   
+  #crop biogeo vars to match extent
+  curr_rast <- rast(here(paste0("/Volumes/PROBOI/Data/CMEM_1994_2017_NEP_blwh/biogeo/", biogeo_vars[i], "_Jan1994_Dec2017_0.25_D.nc"))) 
+   
   template_rast <- rast(
       crs = crs(curr_rast),
       extent = ext(-166, -81, -10, 61), 
@@ -96,7 +101,7 @@ for(i in 1:length(biogeo_vars)){
   time(rast_clean) <- time(curr_rast)
   varnames(rast_clean) <- varnames(curr_rast)
 
-  writeCDF(rast_clean, here(paste0("/Volumes/PROBOI/Data/CMEM_1994_2017_NEP_blwh/biogeo/processed/", curr_var, "_Jan1994_Dec2017_0.25_D.nc")))
+  writeCDF(rast_clean, here(paste0("/Volumes/PROBOI/Data/CMEM_1994_2017_NEP_blwh/biogeo/processed/", biogeo_vars[i], "_Jan1994_Dec2017_0.25_D.nc")), overwrite = TRUE)
 }
 
 # static variables ####
