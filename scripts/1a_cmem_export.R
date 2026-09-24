@@ -39,7 +39,7 @@ cmem_nc <- function(cmem_id, out_directory, out_file, cmem_var, start_date, end_
 
 # ocean physics subset extract: 0m, full domain, Jan 2016 ####
 phys_vars <- c("thetao", "so", "zos", "uo", "vo") #SST, salinity, MLD, eastward ocean current velocity, northward ocean current velocity
-phys_vars <- c("zos")
+#phys_vars <- c("zos")
 
 #loop through physics vars and downloads one .nc file per variable across the specified time window
 for(i in 1:length(phys_vars)){
